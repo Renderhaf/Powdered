@@ -4,6 +4,9 @@
   <canvas id="myCan" style=""></canvas>
   <script>
     // border:1px solid #000000;
+    var sp = prompt("Block Size (Default = 5): ");
+    if (sp == "") {var bsize = 5;}
+    else {var bsize = parseInt(sp)}
     var oldx = 0;
     var oldy = 0;
 
@@ -52,7 +55,16 @@
     function Draw(e){
       var mouse = getMousePos(c, e);
       x.fillStyle = "Black";
-      powders.push([mouse["x"], mouse["y"], 100]);
+      var mx = parseInt(mouse["x"]/bsize)*bsize;
+      var my = parseInt(mouse["y"]/bsize)*bsize;
+
+      for (var i = 0; i < powders.length; i++){
+        if (powders[i][0] == mx && parseInt(powders[i][1])+1 == my){
+          return;
+        }
+      }
+
+      powders.push([mx, my, 100]);
 
       // x.fillRect(mouse["x"],mouse["y"],1,1); // Boxes
 
@@ -76,7 +88,8 @@
       if (powders.length == 0) return;
 
       for (var i = 0; i < powders.length; i++){
-          var add = Math.random() * 2 + map(powders[i][2],100,0,0,3);
+          var add = Math.random() * bsize + map(powders[i][2],100,0,0,bsize*2);;
+          console.log(add)
           var didsomething = false;
 
           for (var h = 0; h < powders.length; h++){
@@ -84,9 +97,9 @@
             if (powders[i][0] == powders[h][0]){
               if (powders[i][1] == powders[h][1]){ // if the same, go up
                 didsomething = true;
-                powders[i][1] -= 1;
+                powders[i][1] -= bsize;
               }
-              if (powders[i][1]+1 == powders[h][1]){ // if above, stay
+              if (powders[i][1]+bsize == powders[h][1]){ // if above, stay
                 didsomething = true;
               }
             }
@@ -98,22 +111,22 @@
               var xx = Math.random();
               if (didsomething){
                 if (xx > 0.5){
-                  powders[i][0] += 1;
+                  powders[i][0] += bsize;
                 } else {
-                  powders[i][0] -= 1;
+                  powders[i][0] -= bsize;
                 }
               } else {
                 if (xx > 0.25 & xx < 0.5){
-                  powders[i][0] += 1;
+                  powders[i][0] += bsize;
                 } else  if (xx < 0.25) {
-                  powders[i][0] -= 1;
+                  powders[i][0] -= bsize;
                 }
               }
             }
           }
 
-          if (powders[i][1] >= c.height-1 && gro && !didsomething){ // floor
-            powders[i][1] = c.height -1;
+          if (powders[i][1] >= c.height-bsize && gro && !didsomething){ // floor
+            powders[i][1] = c.height -bsize;
             didsomething = true;
           }
 
@@ -123,7 +136,7 @@
 
           powders[i][2] -= Math.random();
           if (powders[i][2] < 0 && dis) {powders.splice(i,i+1)}
-          x.fillRect(powders[i][0],powders[i][1],2,2)
+          x.fillRect(powders[i][0],powders[i][1],bsize,bsize)
       }
 
 
