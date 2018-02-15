@@ -1,0 +1,115 @@
+<html>
+<title>Powdered</title>
+<body align="center">
+  <canvas id="myCan" style=""></canvas>
+  <script>
+    // border:1px solid #000000;
+    var oldx = 0;
+    var oldy = 0;
+
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+
+    var c = document.getElementById("myCan");
+    var x = c.getContext("2d");
+
+    c.width = w-20;
+    c.height = h-30;
+
+    var powders = [];
+
+    var dis = true;
+    var gro = false;
+    c.addEventListener("mousemove", Draw);
+    document.addEventListener("keypress", function(event) {
+      if (event.keyCode == 49) {
+          //toggles clear
+          dis = !dis;
+      }
+      if (event.keyCode == 50) {
+          //ground
+          gro = !gro;
+      }
+    })
+
+    function map(value, low1, high1, low2, high2) {
+      return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+    }
+
+    function getMousePos(canvas, evt) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
+
+    function Draw(e){
+      var mouse = getMousePos(c, e);
+      x.fillStyle = "Black";
+      powders.push([mouse["x"], mouse["y"], 100]);
+
+      // x.fillRect(mouse["x"],mouse["y"],1,1); // Boxes
+
+      // if (oldy == 0 && oldx == 0) {oldx = mouse["x"]; oldy = mouse["y"]}; // Lines
+      // x.beginPath();
+      // x.moveTo(oldx,oldy);
+      // x.lineTo(mouse["x"],mouse["y"]);
+      // x.stroke();
+      // oldx = mouse["x"];
+      // oldy = mouse["y"];
+    }
+
+    var R = function(r,g,b){
+      return "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+    setInterval(function () {
+      x.fillStyle = "Black";
+      c.width = c.width;
+
+      if (powders.length == 0) return;
+
+      for (var i = 0; i < powders.length; i++){
+        if (powders[i][1] >= c.height-1 && gro){
+          powders[i][1] = c.height -1;
+        } else {
+          var add = Math.random() * 2 + map(powders[i][2],100,0,0,3);
+          var didsomething = false;
+
+          for (var h = 0; h < powders.length; h++){
+            if (h != i){
+              if (powders[i][0] == powders[h][0] && gro){
+                console.log(powders[i][1] + ", " + powders[i][1]);
+                if (powders[i][1] == powders[h][1]){
+                  console.log("Jump")
+                  powders[i][1] -= 100;
+                  didsomething = true;
+                  break;
+                }
+                else if (powders[i][1]+1 == powders[h][1]){
+                  didsomething = true;
+                  break;
+                }
+              }
+            }
+          }
+
+          if(!didsomething){
+            powders[i][1] += add;
+
+          }
+        }
+        powders[i][2] -= Math.random();
+
+
+        if (powders[i][2] < 0 && dis) {powders.splice(i,i+1)}
+
+        x.fillRect(powders[i][0],powders[i][1],2,2)
+      }
+
+    }, 15);
+
+  </script>
+</body>
+</html>
